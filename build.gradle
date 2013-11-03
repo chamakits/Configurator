@@ -1,0 +1,80 @@
+import java.nio.charset.Charset
+
+import com.googlecode.lanterna.TerminalFacade
+import com.googlecode.lanterna.gui.GUIScreen
+import com.googlecode.lanterna.screen.Screen
+import com.googlecode.lanterna.terminal.Terminal
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.5
+version = '1.0'
+jar {
+	manifest {
+		attributes 'Implementation-Title': 'Gradle Quickstart', 'Implementation-Version': version
+	}
+}
+
+repositories { mavenCentral() }
+
+dependencies {
+	compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+	testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+buildscript{
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath 'com.goldmansachs:gs-collections:4.1.0'
+		classpath 'com.googlecode.lanterna:lanterna:2.1.6'
+	}
+}
+
+def src = [
+	main:[
+		java: "src/main/java",
+		resources: "src/main/resources"
+	],
+	test:[
+		java: "src/test/java",
+		resources: "src/test/resources"
+	]
+]
+
+sourceSets {
+	[
+		src.main.java,
+		src.main.resources,
+		src.test.java,
+		src.test.resources
+	].each{ curr -> println curr; file(curr).mkdirs()}
+
+	main{
+		java { srcDir src.main.java }
+		resources { srcDir src.main.resources }
+	}
+	test {
+		java { srcDir src.test.java }
+		resources { srcDir src.test.resources }
+	}
+}
+
+test { systemProperties 'property': 'value' }
+
+
+task runConfigurator << {
+	Terminal terminal = TerminalFacade.createTerminal(System.in, System.out, Charset.forName("UTF8"));
+	Screen screen = new Screen(terminal);
+	GUIScreen textGUI = new GUIScreen(screen);
+	if(textGUI == null) {
+		System.err.println("Couldn't allocate a terminal!");
+		return;
+	}
+	textGUI.getScreen().startScreen();
+	textGUI.setTitle("GUI Test");
+}
+
+
